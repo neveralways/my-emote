@@ -1,0 +1,8 @@
+## Interface: 100207
+## Title: My Emote
+## Notes: An emote tool for access them easily.
+## Author: Neveralways
+## Version: 0.1
+
+Core.lua
+UI.lua
