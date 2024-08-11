@@ -1,0 +1,9 @@
+package-as: MyEmote
+
+enable-nolib-creation: no
+
+move-folders:
+  MyEmote/src: MyEmote
+
+ignore:
+  - README.md
