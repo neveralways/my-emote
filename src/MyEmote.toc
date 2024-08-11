@@ -2,7 +2,7 @@
 ## Title: My Emote
 ## Notes: An emote tool for access them easily.
 ## Author: Neveralways
-## Version: 1.0.0
+## Version: 1.0.1
 ## SavedVariablesPerCharacter: MyEmoteSettings
 
 Config.lua
