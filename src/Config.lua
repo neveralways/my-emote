@@ -5,7 +5,7 @@ MyEmoteSettings = MyEmoteSettings or {}
 emotesCheckButtons = {}
 
 local optionsPanel = CreateFrame("Frame")
-optionsPanel.name = "My Emote " .. GetAddOnMetadata("MyEmote", "Version")
+optionsPanel.name = "My Emote " .. C_AddOns.GetAddOnMetadata("MyEmote", "Version")
 
 local scrollFrame = CreateFrame("ScrollFrame", nil, optionsPanel, "UIPanelScrollFrameTemplate")
 scrollFrame:SetPoint("TOPLEFT", 3, -4)
