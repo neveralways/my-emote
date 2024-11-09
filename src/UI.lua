@@ -35,6 +35,16 @@ local function createEmoteButtons(wheel, emotes)
     local radius = 100
     local buttonSize = 50
 
+    if (MaxEmoteSettings > 8)
+    then
+        radius = 12 * MaxEmoteSettings
+    end
+
+    if radius > 1000
+    then
+        radius = 400
+    end
+
     for i, emote in ipairs(emotes) do
         local button = CreateFrame("Button", "EmoteButton" .. i, wheel, "UIPanelButtonTemplate")
         local transparentTexture = wheel:CreateTexture()
