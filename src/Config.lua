@@ -2,14 +2,13 @@ local MAX_EMOTES = 8
 local numberOfEmotesChecked = 0
 
 MyEmoteSettings = MyEmoteSettings or {}
-MaxEmoteSettings = MaxEmoteSettings or MAX_EMOTES
 emotesCheckButtons = {}
 
 local optionsPanel = CreateFrame("Frame")
 optionsPanel.name = "My Emote " .. C_AddOns.GetAddOnMetadata("MyEmote", "Version")
 
 local scrollFrame = CreateFrame("ScrollFrame", nil, optionsPanel, "UIPanelScrollFrameTemplate")
-scrollFrame:SetPoint("TOPLEFT", 3, -60)
+scrollFrame:SetPoint("TOPLEFT", 3, -4)
 scrollFrame:SetPoint("BOTTOMRIGHT", -27, 4)
 
 local scrollChild = CreateFrame("Frame")
@@ -22,23 +21,9 @@ if SettingsPanel then
     Settings.RegisterAddOnCategory(category)
 end
 
-local titleNumberOfEmotes = optionsPanel:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
-titleNumberOfEmotes:SetPoint("TOPLEFT", 0, 0)
-titleNumberOfEmotes:SetText("Set the number of emotes you want to use")
-local numberInput = CreateFrame("EditBox", nil, optionsPanel, "InputBoxTemplate")
-numberInput:SetPoint("TOPLEFT", titleNumberOfEmotes, "BOTTOMLEFT", 0, -10)
-numberInput:SetSize(50, 20)
-numberInput:SetAutoFocus(false)
-numberInput:SetNumeric(true)
-numberInput:SetMaxLetters(2)
-
 local title = optionsPanel:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
-title:SetPoint("TOPLEFT", 0, -50)
-title:SetText("Emotes")
-
-local function updateTitleNumberOfEmotes()
-    title:SetText("Emotes (" .. numberOfEmotesChecked .. "/" .. MaxEmoteSettings .. ")")
-end
+title:SetPoint("TOP")
+title:SetText(optionsPanel.name)
 
 local function createEmoteCheckButton(parent, x, y, text)
     local cbEmote = CreateFrame("CheckButton", "cbEmote" .. text, parent, "ChatConfigCheckButtonTemplate")
@@ -58,41 +43,21 @@ local function createEmoteCheckButton(parent, x, y, text)
             numberOfEmotesChecked = numberOfEmotesChecked - 1
         end
 
-        if numberOfEmotesChecked > MaxEmoteSettings then
+        if numberOfEmotesChecked > MAX_EMOTES then
             self:SetChecked(false)
             numberOfEmotesChecked = numberOfEmotesChecked - 1
-            print("You can't select more than " .. MaxEmoteSettings .. " emotes.")
+            print("You can't select more than " .. MAX_EMOTES .. " emotes.")
         else
             MyEmoteSettings[text] = self:GetChecked() and true or nil
         end
-
-        updateTitleNumberOfEmotes()
     end)
-
-    updateTitleNumberOfEmotes()
 end
-
-numberInput:SetScript("OnTextChanged", function(self, userInput)
-    if userInput then
-        local value = tonumber(self:GetText())
-        if value then
-            MaxEmoteSettings = value
-            updateTitleNumberOfEmotes()
-        end
-    end
-end)
 
 local function OnEvent(self, event, arg1)
     if event == "ADDON_LOADED" and arg1 == "MyEmote" then
-
-        if not MaxEmoteSettings then
-            numberInput:SetText(tostring(MAX_EMOTES))
-        else
-            numberInput:SetText(tostring(MaxEmoteSettings))
-        end
-        numberInput:SetCursorPosition(0)
-
         local emoteListTitle = scrollChild:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+        title:SetPoint("TOPLEFT", 0, 0)
+        title:SetText("Emotes")
         
         for i, emote in ipairs(EmoteList) do
             emoteTextNormalised = emote:sub(1, 1):upper() .. emote:sub(2):lower()
