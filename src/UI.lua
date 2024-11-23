@@ -1,7 +1,6 @@
 local emoteButtons = {}
 
 local wheel = CreateFrame("Frame", "MyEmoteFrame", UIParent, "BackdropTemplate")
-wheel:SetSize(200, 200)
 wheel:Hide()
 
 local function updateEmotes()
@@ -34,8 +33,18 @@ local function createEmoteButtons(wheel, emotes)
     local numEmotes = #emotes
     local radius = 100
     local buttonSize = 50
+    local numberOfEmotesChecked = getNumberOfEmotesChecked()
+    if (numberOfEmotesChecked > 8) then
+        radius = 12 * numberOfEmotesChecked
+    end
+
+    if radius > 1000
+    then
+        radius = 400
+    end
 
     for i, emote in ipairs(emotes) do
+        wheel:SetSize(radius * 2, radius * 2)
         local button = CreateFrame("Button", "EmoteButton" .. i, wheel, "UIPanelButtonTemplate")
         local transparentTexture = wheel:CreateTexture()
         transparentTexture:SetColorTexture(0, 0, 0, 0)

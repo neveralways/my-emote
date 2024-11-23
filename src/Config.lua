@@ -1,4 +1,3 @@
-local MAX_EMOTES = 8
 local numberOfEmotesChecked = 0
 
 MyEmoteSettings = MyEmoteSettings or {}
@@ -43,13 +42,7 @@ local function createEmoteCheckButton(parent, x, y, text)
             numberOfEmotesChecked = numberOfEmotesChecked - 1
         end
 
-        if numberOfEmotesChecked > MAX_EMOTES then
-            self:SetChecked(false)
-            numberOfEmotesChecked = numberOfEmotesChecked - 1
-            print("You can't select more than " .. MAX_EMOTES .. " emotes.")
-        else
-            MyEmoteSettings[text] = self:GetChecked() and true or nil
-        end
+        MyEmoteSettings[text] = self:GetChecked() and true or nil
     end)
 end
 
@@ -73,5 +66,12 @@ local function OnEvent(self, event, arg1)
     end
 end
 
+function getNumberOfEmotesChecked()
+    return numberOfEmotesChecked
+end
+
 optionsPanel:SetScript("OnEvent", OnEvent)
 optionsPanel:RegisterEvent("ADDON_LOADED")
+
+
+return Config
