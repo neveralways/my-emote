@@ -1,5 +1,5 @@
 <Bindings>
-    <Binding name="TOGGLEMYEMOTE">
+    <Binding name="Toggle My Emote">
         ToggleWheel();
     </Binding>
 </Bindings>
