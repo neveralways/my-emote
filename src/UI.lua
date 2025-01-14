@@ -1,7 +1,9 @@
-local emoteButtons = {}
+local addonName, addonTable = ...
 
 local wheel = CreateFrame("Frame", "MyEmoteFrame", UIParent, "BackdropTemplate")
 wheel:Hide()
+
+local emoteButtons = {}
 
 local function updateEmotes()
     local selectedEmotes = {}
@@ -12,7 +14,7 @@ local function updateEmotes()
     end
 
     if #selectedEmotes == 0 then
-        selectedEmotes = {"Wave", "Cheer", "Dance", "Cry", "Rasp", "Train", "Flee", "Joke"}
+        selectedEmotes = MyEmoteDefaults
     end
 
     return selectedEmotes
@@ -34,12 +36,12 @@ local function createEmoteButtons(wheel, emotes)
     local radius = 100
     local buttonSize = 50
     local numberOfEmotesChecked = getNumberOfEmotesChecked()
-    if (numberOfEmotesChecked > 8) then
+
+    if numberOfEmotesChecked > 8 then
         radius = 12 * numberOfEmotesChecked
     end
 
-    if radius > 1000
-    then
+    if radius > 1000 then
         radius = 400
     end
 
@@ -51,6 +53,7 @@ local function createEmoteButtons(wheel, emotes)
         button:SetHighlightTexture(transparentTexture)
         button:SetHighlightFontObject(button:GetNormalFontObject())
         button:SetSize(buttonSize, buttonSize)
+        
         local angle = (i - 1) * (2 * math.pi / numEmotes)
         local x = math.cos(angle) * radius
         local y = math.sin(angle) * radius
@@ -61,7 +64,7 @@ local function createEmoteButtons(wheel, emotes)
         local anim = animGroup:CreateAnimation("Translation")
         anim:SetOffset(x, y)
         anim:SetDuration(0.1)
-        anim:SetSmoothing("OUT") 
+        anim:SetSmoothing("OUT")
 
         animGroup:SetScript("OnPlay", function()
             button:SetScript("OnEnter", nil)
@@ -84,6 +87,7 @@ local function ToggleWheel()
     local cursorX, cursorY = GetCursorPosition()
     local uiScale = UIParent:GetEffectiveScale()
     wheel:SetPoint("CENTER", UIParent, "BOTTOMLEFT", cursorX / uiScale, cursorY / uiScale)
+    
     if wheel:IsShown() then
         wheel:Hide()
     else
@@ -108,4 +112,6 @@ wheel:SetScript("OnMouseDown", function(self, button)
     end
 end)
 
-_G.ToggleWheel = ToggleWheel
+function MyEmote_UI_Init()
+    _G["ToggleWheel"] = ToggleWheel
+end

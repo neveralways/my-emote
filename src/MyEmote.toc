@@ -5,5 +5,7 @@
 ## Version: 1.1.2
 ## SavedVariablesPerCharacter: MyEmoteSettings
 
+MyEmote.lua
+Data.lua
 Config.lua
 UI.lua
