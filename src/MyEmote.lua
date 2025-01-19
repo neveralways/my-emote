@@ -22,7 +22,7 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 end)
 
 local function showEmoteCount()
-    print("Emote count: " .. MyEmoteData.emoteCount)
+    print("You have used " .. MyEmoteData.emoteCount .. " emotes!")
 end
 
 SLASH_MYEMOTE1 = "/myemote"
