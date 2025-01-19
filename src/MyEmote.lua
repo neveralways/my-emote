@@ -20,3 +20,10 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
     elseif event == "PLAYER_LOGOUT" then
     end
 end)
+
+local function showEmoteCount()
+    print("Emote count: " .. MyEmoteData.emoteCount)
+end
+
+SLASH_MYEMOTE1 = "/myemote"
+SlashCmdList["MYEMOTE"] = showEmoteCount
