@@ -60,16 +60,33 @@ function MyEmote_Config_Init()
     title:SetPoint("TOP")
     title:SetText(optionsPanel.name)
 
-    local yOffset = -40
-    for i, emote in ipairs(EmoteList) do
-        local emoteTextNormalised = emote:sub(1, 1):upper() .. emote:sub(2):lower()
-        createEmoteCheckButton(scrollChild, 50, yOffset, emoteTextNormalised)
-        yOffset = yOffset - 20
+    local emoteSet = {}
+    
+    for i = 1, MAXEMOTEINDEX do
+        local token = _G["EMOTE" .. i .. "_TOKEN"]
+        if token then
+            local norm = token:sub(1,1):upper() .. token:sub(2):lower()
+            emoteSet[norm] = true
+        end
     end
 
-    for i, emote in ipairs(TextEmoteSpeechList) do
-        local emoteTextNormalised = emote:sub(1, 1):upper() .. emote:sub(2):lower()
-        createEmoteCheckButton(scrollChild, 50, yOffset, emoteTextNormalised)
-        yOffset = yOffset - 20
+    for i = 1, #CustomEmotes do
+        local emote = CustomEmotes[i]
+        if emote then
+            local norm = emote:sub(1,1):upper() .. emote:sub(2):lower()
+            emoteSet[norm] = true
+        end
     end
+
+    local allEmotes = {}
+    for norm in pairs(emoteSet) do
+        table.insert(allEmotes, norm)
+    end
+
+    table.sort(allEmotes)
+
+    for i, emote in ipairs(allEmotes) do
+        createEmoteCheckButton(scrollChild, 50, -40 - (i - 1) * 20, emote)
+    end
+
 end

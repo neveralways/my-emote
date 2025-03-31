@@ -9,3 +9,7 @@ MyEmoteDefaults = {
     "Flee",
     "Joke"
 }
+
+CustomEmotes = {
+    "Doom"
+}
