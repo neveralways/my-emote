@@ -11,5 +11,6 @@ MyEmoteDefaults = {
 }
 
 CustomEmotes = {
-    "Doom"
+    "Doom",
+    "Silly"
 }
