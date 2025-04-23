@@ -1,4 +1,4 @@
-## Interface: 110100
+## Interface: 110105
 ## Title: My Emote
 ## Notes: An emote tool for access them easily.
 ## Author: Neveralways
