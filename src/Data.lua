@@ -10,7 +10,4 @@ MyEmoteDefaults = {
     "Joke"
 }
 
-CustomEmotes = {
-    "Doom",
-    "Silly"
-}
+CustomEmotes = {}
