@@ -32,6 +32,43 @@ local function loadSavedConfig()
 end
 
 -- ============================================================================
+-- FUNCIONES DE ESCALADO DINÁMICO
+-- ============================================================================
+-- Radio de referencia para el escalado (120 es el valor por defecto)
+local BASE_RADIUS = 120
+
+-- Calcula el innerRadius dinámicamente basado en el radio actual
+local function getScaledInnerRadius()
+    -- El innerRadius escala proporcionalmente pero con un mínimo y máximo
+    local ratio = WHEEL_CONFIG.radius / BASE_RADIUS
+    local scaled = 30 * ratio
+    return math.max(25, math.min(scaled, 50))  -- Entre 25 y 50
+end
+
+-- Calcula tamaños de fuente escalados con límites para evitar texto gigante
+local function getScaledFontSize(baseRatio)
+    -- Usar escala logarítmica suave para radios grandes
+    local ratio = WHEEL_CONFIG.radius / BASE_RADIUS
+    -- Aplicar curva sqrt para suavizar el crecimiento en radios grandes
+    local smoothRatio = math.sqrt(ratio)
+    local fontSize = math.floor(BASE_RADIUS * baseRatio * smoothRatio)
+    -- Limitar tamaño máximo y mínimo
+    local minSize = math.floor(BASE_RADIUS * baseRatio * 0.8)
+    local maxSize = math.floor(BASE_RADIUS * baseRatio * 1.5)
+    return math.max(minSize, math.min(fontSize, maxSize))
+end
+
+-- Calcula offset de posición escalado
+local function getScaledOffset(baseRatio)
+    return WHEEL_CONFIG.radius * baseRatio
+end
+
+-- Calcula número de líneas para el wedge de highlight escalado
+local function getScaledWedgeLines()
+    return math.max(12, math.floor(WHEEL_CONFIG.radius / 6))
+end
+
+-- ============================================================================
 -- FRAME PRINCIPAL
 -- ============================================================================
 local wheel = CreateFrame("Frame", "MyEmoteFrame", UIParent)
@@ -42,6 +79,7 @@ wheel:Hide()
 -- Elementos visuales
 local segments = {}          -- Texturas de segmentos
 local dividerLines = {}      -- Líneas divisorias
+local circleLines = {}       -- Líneas del círculo exterior e interior
 local labels = {}            -- Etiquetas de texto
 local backgroundCircle       -- Círculo de fondo
 local backgroundMask         -- Máscara circular (reutilizable)
@@ -128,11 +166,17 @@ local function clearVisualElements()
     end
     segments = {}
     
-    -- Limpiar líneas
+    -- Limpiar líneas divisorias
     for _, line in pairs(dividerLines) do
         line:Hide()
     end
     dividerLines = {}
+    
+    -- Limpiar líneas del círculo
+    for _, line in pairs(circleLines) do
+        line:Hide()
+    end
+    circleLines = {}
     
     -- Limpiar líneas de highlight
     for _, line in pairs(highlightLines) do
@@ -189,7 +233,7 @@ local function createDividerLines(numSegments)
     if numSegments <= 1 then return end
     
     local radius = WHEEL_CONFIG.radius
-    local innerRadius = WHEEL_CONFIG.innerRadius
+    local innerRadius = getScaledInnerRadius()
     local segmentAngle = (2 * math.pi) / numSegments
     
     for i = 1, numSegments do
@@ -235,10 +279,12 @@ local function createCircleOutline()
         
         line:SetStartPoint("CENTER", wheel, x1, y1)
         line:SetEndPoint("CENTER", wheel, x2, y2)
+        
+        table.insert(circleLines, line)
     end
     
     -- Círculo interior
-    local innerRadius = WHEEL_CONFIG.innerRadius
+    local innerRadius = getScaledInnerRadius()
     for i = 1, numPoints do
         local line = wheel:CreateLine(nil, "BORDER")
         line:SetThickness(1)
@@ -254,6 +300,8 @@ local function createCircleOutline()
         
         line:SetStartPoint("CENTER", wheel, x1, y1)
         line:SetEndPoint("CENTER", wheel, x2, y2)
+        
+        table.insert(circleLines, line)
     end
 end
 
@@ -288,7 +336,7 @@ local function updateHighlightWedge(segmentIndex, numSegments)
     end
     
     local radius = WHEEL_CONFIG.radius
-    local innerRadius = WHEEL_CONFIG.innerRadius
+    local innerRadius = getScaledInnerRadius()
     local segmentAngle = (2 * math.pi) / numSegments
     
     -- Calcular ángulos del segmento
@@ -297,12 +345,12 @@ local function updateHighlightWedge(segmentIndex, numSegments)
     local midAngle = (startAngle + endAngle) / 2
     
     -- Dibujar líneas del wedge para dar efecto de segmento iluminado
-    local numWedgeLines = 12
+    local numWedgeLines = getScaledWedgeLines()
     for i = 1, numWedgeLines do
         if not highlightLines[i] then
             highlightLines[i] = wheel:CreateLine(nil, "ARTWORK")
-            highlightLines[i]:SetThickness(math.max(1, (radius - innerRadius) / numWedgeLines))
         end
+        highlightLines[i]:SetThickness(math.max(1, (radius - innerRadius) / numWedgeLines))
         
         local line = highlightLines[i]
         line:SetColorTexture(WHEEL_CONFIG.highlightColor[1], WHEEL_CONFIG.highlightColor[2], 
@@ -332,8 +380,8 @@ end
 local function createLabels(emotes)
     local numEmotes = #emotes
     local radius = WHEEL_CONFIG.radius
-    local innerRadius = WHEEL_CONFIG.innerRadius
-    local labelRadius = (radius + innerRadius) / 2 + 10  -- Posición del texto
+    local innerRadius = getScaledInnerRadius()
+    local labelRadius = (radius + innerRadius) / 2 + getScaledOffset(0.05)  -- Posición del texto escalada
     local segmentAngle = (2 * math.pi) / numEmotes
     
     for i, emote in ipairs(emotes) do
@@ -345,8 +393,8 @@ local function createLabels(emotes)
         local x = math.cos(angle) * labelRadius
         local y = math.sin(angle) * labelRadius
         
-        -- Establecer la fuente ANTES de SetText
-        label:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+        -- Establecer la fuente ANTES de SetText (tamaño escalado)
+        label:SetFont("Fonts\\FRIZQT__.TTF", getScaledFontSize(0.108), "OUTLINE")
         label:SetTextColor(unpack(WHEEL_CONFIG.textColor))
         label:SetShadowOffset(2, -2)
         label:SetShadowColor(0, 0, 0, 1)
@@ -365,14 +413,16 @@ local function createCenterText()
     if not centerText then
         centerText = wheel:CreateFontString(nil, "OVERLAY")
         centerText:SetPoint("CENTER", wheel, "CENTER", 0, 0)
-        centerText:SetFont("Fonts\\FRIZQT__.TTF", 24, "OUTLINE")
-        centerText:SetText("×")
-        centerText:SetTextColor(0.9, 0.3, 0.3, 0.8)
-        centerText:SetShadowOffset(2, -2)
-        centerText:SetShadowColor(0, 0, 0, 1)
-        centerText:SetJustifyH("CENTER")
-        centerText:SetJustifyV("MIDDLE")
     end
+    
+    -- Actualizar fuente escalada cada vez que se construye el menú
+    centerText:SetFont("Fonts\\FRIZQT__.TTF", getScaledFontSize(0.2), "OUTLINE")
+    centerText:SetText("×")
+    centerText:SetTextColor(0.9, 0.3, 0.3, 0.8)
+    centerText:SetShadowOffset(2, -2)
+    centerText:SetShadowColor(0, 0, 0, 1)
+    centerText:SetJustifyH("CENTER")
+    centerText:SetJustifyV("MIDDLE")
     
     centerText:Show()
 end
@@ -385,18 +435,18 @@ local function updateHighlight(segmentIndex)
     
     selectedSegment = segmentIndex
     
-    -- Resetear todos los labels a color normal
+    -- Resetear todos los labels a color normal con tamaño escalado
     for i, label in pairs(labels) do
         if label then
             label:SetTextColor(unpack(WHEEL_CONFIG.textColor))
-            label:SetFont("Fonts\\FRIZQT__.TTF", 13, "OUTLINE")
+            label:SetFont("Fonts\\FRIZQT__.TTF", getScaledFontSize(0.108), "OUTLINE")
         end
     end
     
-    -- Resaltar el segmento seleccionado (solo cambio de texto)
+    -- Resaltar el segmento seleccionado (texto más grande escalado)
     if segmentIndex and labels[segmentIndex] then
         labels[segmentIndex]:SetTextColor(unpack(WHEEL_CONFIG.selectedTextColor))
-        labels[segmentIndex]:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE")
+        labels[segmentIndex]:SetFont("Fonts\\FRIZQT__.TTF", getScaledFontSize(0.133), "OUTLINE")
     end
     
     -- Actualizar el wedge de highlight visual
@@ -410,7 +460,7 @@ local function buildWheel(emotes)
     clearVisualElements()
     
     local numEmotes = #emotes
-    local size = WHEEL_CONFIG.radius * 2 + 40
+    local size = WHEEL_CONFIG.radius * 2 + getScaledOffset(0.333)
     wheel:SetSize(size, size)
     
     -- Crear elementos visuales
@@ -435,29 +485,30 @@ local function onWheelUpdate(self, elapsed)
     if not angle then return end
     
     local numEmotes = #currentEmotes
+    local innerRadius = getScaledInnerRadius()
     
     -- Detectar si está en el centro para hacer hover en la X
-    if distance < WHEEL_CONFIG.innerRadius then
-        -- Cursor en el centro - resaltar la X
+    if distance < innerRadius then
+        -- Cursor en el centro - resaltar la X con tamaño escalado
         if centerText then
             centerText:SetTextColor(1, 0.4, 0.4, 1)
-            centerText:SetFont("Fonts\\FRIZQT__.TTF", 28, "OUTLINE")
+            centerText:SetFont("Fonts\\FRIZQT__.TTF", getScaledFontSize(0.233), "OUTLINE")
         end
         updateHighlight(nil)
     -- Solo detectar si está dentro del radio y fuera del centro
-    elseif distance >= WHEEL_CONFIG.innerRadius and distance <= WHEEL_CONFIG.radius + 20 then
-        -- Restaurar X a estado normal
+    elseif distance >= innerRadius and distance <= WHEEL_CONFIG.radius + getScaledOffset(0.166) then
+        -- Restaurar X a estado normal con tamaño escalado
         if centerText then
             centerText:SetTextColor(0.9, 0.3, 0.3, 0.8)
-            centerText:SetFont("Fonts\\FRIZQT__.TTF", 24, "OUTLINE")
+            centerText:SetFont("Fonts\\FRIZQT__.TTF", getScaledFontSize(0.2), "OUTLINE")
         end
         local segment = getSegmentFromAngle(angle, numEmotes)
         updateHighlight(segment)
     else
-        -- Restaurar X a estado normal
+        -- Restaurar X a estado normal con tamaño escalado
         if centerText then
             centerText:SetTextColor(0.9, 0.3, 0.3, 0.8)
-            centerText:SetFont("Fonts\\FRIZQT__.TTF", 24, "OUTLINE")
+            centerText:SetFont("Fonts\\FRIZQT__.TTF", getScaledFontSize(0.2), "OUTLINE")
         end
         updateHighlight(nil)
     end
@@ -547,7 +598,7 @@ wheel:SetScript("OnMouseDown", function(self, button)
         end
         
         -- Si está en el centro (zona de la X), cerrar
-        if distance and distance < WHEEL_CONFIG.innerRadius then
+        if distance and distance < getScaledInnerRadius() then
             self:Hide()
             return
         end
