@@ -1,4 +1,4 @@
-## Interface: 120000, 110207
+## Interface: 120001
 ## Title: My Emote
 ## Notes: An emote tool for access them easily.
 ## Author: Neveralways
