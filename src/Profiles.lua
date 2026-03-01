@@ -7,6 +7,7 @@
 
 MyEmoteProfiles = MyEmoteProfiles or { profiles = {} }
 MyEmoteActiveProfile = MyEmoteActiveProfile or nil
+local L = MyEmoteL
 
 -- Copia superficial de una tabla de ajustes (claves string → boolean/number/nil)
 local function copySettings(src)
@@ -20,22 +21,22 @@ end
 --- Guarda MyEmoteSettings como un perfil con el nombre dado.
 function MyEmote_Profiles_Save(name)
     if not name or name == "" then
-        print("|cffff6600MyEmote:|r Indica un nombre para el perfil.")
+        print("|cffff6600MyEmote:|r " .. L["PROFILE_NO_NAME"])
         return
     end
     MyEmoteProfiles.profiles[name] = copySettings(MyEmoteSettings)
     MyEmoteActiveProfile = name
-    print("|cff00ff00MyEmote:|r Perfil '" .. name .. "' guardado.")
+    print("|cff00ff00MyEmote:|r " .. string.format(L["PROFILE_SAVED"], name))
 end
 
 --- Carga un perfil guardado en MyEmoteSettings y refresca la UI de config.
 function MyEmote_Profiles_Load(name)
     if not name or name == "" then
-        print("|cffff6600MyEmote:|r Indica un nombre de perfil para cargar.")
+        print("|cffff6600MyEmote:|r " .. L["PROFILE_NO_NAME_LOAD"])
         return
     end
     if not MyEmoteProfiles.profiles[name] then
-        print("|cffff6600MyEmote:|r El perfil '" .. name .. "' no existe.")
+        print("|cffff6600MyEmote:|r " .. string.format(L["PROFILE_NOT_FOUND"], name))
         return
     end
     wipe(MyEmoteSettings)
@@ -46,24 +47,24 @@ function MyEmote_Profiles_Load(name)
     if MyEmote_Config_RefreshUI then
         MyEmote_Config_RefreshUI()
     end
-    print("|cff00ff00MyEmote:|r Perfil '" .. name .. "' cargado.")
+    print("|cff00ff00MyEmote:|r " .. string.format(L["PROFILE_LOADED"], name))
 end
 
 --- Elimina un perfil del banco de perfiles.
 function MyEmote_Profiles_Delete(name)
     if not name or name == "" then
-        print("|cffff6600MyEmote:|r Indica un nombre de perfil para eliminar.")
+        print("|cffff6600MyEmote:|r " .. L["PROFILE_NO_NAME_DELETE"])
         return
     end
     if not MyEmoteProfiles.profiles[name] then
-        print("|cffff6600MyEmote:|r El perfil '" .. name .. "' no existe.")
+        print("|cffff6600MyEmote:|r " .. string.format(L["PROFILE_NOT_FOUND"], name))
         return
     end
     MyEmoteProfiles.profiles[name] = nil
     if MyEmoteActiveProfile == name then
         MyEmoteActiveProfile = nil
     end
-    print("|cff00ff00MyEmote:|r Perfil '" .. name .. "' eliminado.")
+    print("|cff00ff00MyEmote:|r " .. string.format(L["PROFILE_DELETED"], name))
 end
 
 --- Devuelve una lista ordenada con los nombres de todos los perfiles guardados.

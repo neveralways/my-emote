@@ -2,10 +2,11 @@
 ## Title: My Emote
 ## Notes: An emote tool for access them easily.
 ## Author: Neveralways
-## Version: 2.1.0
+## Version: 2.1.1
 ## SavedVariables: MyEmoteProfiles
 ## SavedVariablesPerCharacter: MyEmoteSettings, MyEmoteData, MyEmoteActiveProfile
 
+Locales.lua
 Data.lua
 Profiles.lua
 Config.lua

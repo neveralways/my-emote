@@ -5,6 +5,7 @@ local scrollFrame
 local scrollChild
 local activeProfileLabel
 local profileDropdown
+local L = MyEmoteL
 
 local numberOfEmotesChecked = 0
 MyEmoteSettings = MyEmoteSettings or {}
@@ -35,7 +36,7 @@ local function createEmoteCheckButton(parent, x, y, text)
             -- Limitar a 12 emotes máximo
             if numberOfEmotesChecked >= 12 then
                 self:SetChecked(false)
-                print("|cffff6600MyEmote:|r Máximo 12 emotes permitidos en el menú radial.")
+                print("|cffff6600MyEmote:|r " .. L["MAX_EMOTES_REACHED"])
                 return
             end
             numberOfEmotesChecked = numberOfEmotesChecked + 1
@@ -69,8 +70,8 @@ end
 function MyEmote_Config_RefreshUI()
     -- Etiqueta de perfil activo
     if activeProfileLabel then
-        local name = MyEmoteActiveProfile or "ninguno"
-        activeProfileLabel:SetText("Perfil activo: |cffffd700" .. name .. "|r")
+        local name = MyEmoteActiveProfile or L["PROFILE_NONE"]
+        activeProfileLabel:SetText(string.format(L["PROFILE_ACTIVE"], name))
     end
     -- Dropdown de perfiles
     if profileDropdown then
@@ -163,22 +164,22 @@ function MyEmote_Config_Init()
     -- ========================================================================
     local profilesTitle = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     profilesTitle:SetPoint("TOPLEFT", 20, -20)
-    profilesTitle:SetText("|cff00ff00Gestión de Perfiles|r")
+    profilesTitle:SetText("|cff00ff00" .. L["SECTION_PROFILES"] .. "|r")
 
     local profilesDesc = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     profilesDesc:SetPoint("TOPLEFT", 20, -40)
-    profilesDesc:SetText("Guarda y carga configuraciones compartidas entre personajes.")
+    profilesDesc:SetText(L["SECTION_PROFILES_DESC"])
 
     activeProfileLabel = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
     activeProfileLabel:SetPoint("TOPLEFT", 20, -58)
     do
-        local activeName = MyEmoteActiveProfile or "ninguno"
-        activeProfileLabel:SetText("Perfil activo: |cffffd700" .. activeName .. "|r")
+        local activeName = MyEmoteActiveProfile or L["PROFILE_NONE"]
+        activeProfileLabel:SetText(string.format(L["PROFILE_ACTIVE"], activeName))
     end
 
     local nameInputLabel = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     nameInputLabel:SetPoint("TOPLEFT", 20, -80)
-    nameInputLabel:SetText("Nombre del perfil:")
+    nameInputLabel:SetText(L["PROFILE_NAME_LABEL"])
 
     local nameInput = CreateFrame("EditBox", "MyEmoteProfileNameInput", scrollChild, "InputBoxTemplate")
     nameInput:SetPoint("TOPLEFT", 20, -96)
@@ -192,7 +193,7 @@ function MyEmote_Config_Init()
     local saveBtn = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
     saveBtn:SetPoint("LEFT", nameInput, "RIGHT", 8, 0)
     saveBtn:SetSize(100, 22)
-    saveBtn:SetText("Guardar perfil")
+    saveBtn:SetText(L["PROFILE_SAVE_BTN"])
     saveBtn:SetScript("OnClick", function()
         local name = nameInput:GetText()
         MyEmote_Profiles_Save(name)
@@ -201,7 +202,7 @@ function MyEmote_Config_Init()
 
     local selectLabel = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalSmall")
     selectLabel:SetPoint("TOPLEFT", 20, -130)
-    selectLabel:SetText("Seleccionar perfil:")
+    selectLabel:SetText(L["PROFILE_SELECT_LABEL"])
 
     profileDropdown = CreateFrame("Frame", "MyEmoteProfileDropdown", scrollChild, "UIDropDownMenuTemplate")
     profileDropdown:SetPoint("TOPLEFT", 5, -148)
@@ -211,21 +212,21 @@ function MyEmote_Config_Init()
     local loadBtn = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
     loadBtn:SetPoint("TOPLEFT", 20, -193)
     loadBtn:SetSize(100, 22)
-    loadBtn:SetText("Cargar perfil")
+    loadBtn:SetText(L["PROFILE_LOAD_BTN"])
     loadBtn:SetScript("OnClick", function()
         local name = UIDropDownMenu_GetSelectedValue(profileDropdown)
         if name then
             nameInput:SetText(name)
             MyEmote_Profiles_Load(name)
         else
-            print("|cffff6600MyEmote:|r Selecciona un perfil de la lista.")
+            print("|cffff6600MyEmote:|r " .. L["PROFILE_SELECT_FIRST"])
         end
     end)
 
     local deleteBtn = CreateFrame("Button", nil, scrollChild, "UIPanelButtonTemplate")
     deleteBtn:SetPoint("LEFT", loadBtn, "RIGHT", 8, 0)
     deleteBtn:SetSize(100, 22)
-    deleteBtn:SetText("Eliminar perfil")
+    deleteBtn:SetText(L["PROFILE_DELETE_BTN"])
     deleteBtn:SetScript("OnClick", function()
         local name = UIDropDownMenu_GetSelectedValue(profileDropdown)
         if name then
@@ -233,7 +234,7 @@ function MyEmote_Config_Init()
             UIDropDownMenu_SetSelectedValue(profileDropdown, nil)
             MyEmote_Config_RefreshUI()
         else
-            print("|cffff6600MyEmote:|r Selecciona un perfil de la lista.")
+            print("|cffff6600MyEmote:|r " .. L["PROFILE_SELECT_FIRST"])
         end
     end)
 
@@ -242,17 +243,17 @@ function MyEmote_Config_Init()
     -- ========================================================================
     local sectionTitle = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     sectionTitle:SetPoint("TOPLEFT", 20, -235)
-    sectionTitle:SetText("|cff00ff00Configuración del Menú Radial|r")
+    sectionTitle:SetText("|cff00ff00" .. L["SECTION_RADIAL"] .. "|r")
     
     local desc = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     desc:SetPoint("TOPLEFT", 20, -255)
-    desc:SetText("Personaliza la apariencia del menú circular de emotes (máx. 12 emotes)")
+    desc:SetText(L["SECTION_RADIAL_DESC"])
     
     -- Sliders de configuración
     local yOffset = -285
     
     -- Radio del menú
-    createSlider(scrollChild, "MyEmoteRadiusSlider", "Tamaño del menú", 80, 200, 10, 20, yOffset, 
+    createSlider(scrollChild, "MyEmoteRadiusSlider", L["SLIDER_RADIUS"], 80, 200, 10, 20, yOffset, 
         MyEmoteSettings.wheelRadius or DEFAULT_WHEEL_CONFIG.radius,
         function(value)
             MyEmoteSettings.wheelRadius = value
@@ -261,7 +262,7 @@ function MyEmote_Config_Init()
     yOffset = yOffset - 50
     
     -- Opacidad del fondo
-    createSlider(scrollChild, "MyEmoteBgOpacitySlider", "Opacidad del fondo", 0.3, 1.0, 0.05, 20, yOffset,
+    createSlider(scrollChild, "MyEmoteBgOpacitySlider", L["SLIDER_OPACITY"], 0.3, 1.0, 0.05, 20, yOffset,
         MyEmoteSettings.bgOpacity or DEFAULT_WHEEL_CONFIG.bgOpacity,
         function(value)
             MyEmoteSettings.bgOpacity = value
@@ -270,7 +271,7 @@ function MyEmote_Config_Init()
     yOffset = yOffset - 50
     
     -- Grosor de líneas
-    createSlider(scrollChild, "MyEmoteLineSlider", "Grosor de líneas", 1, 5, 1, 20, yOffset,
+    createSlider(scrollChild, "MyEmoteLineSlider", L["SLIDER_LINE"], 1, 5, 1, 20, yOffset,
         MyEmoteSettings.lineThickness or DEFAULT_WHEEL_CONFIG.lineThickness,
         function(value)
             MyEmoteSettings.lineThickness = value
@@ -283,11 +284,11 @@ function MyEmote_Config_Init()
     
     local emotesTitle = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormalLarge")
     emotesTitle:SetPoint("TOPLEFT", 20, yOffset)
-    emotesTitle:SetText("|cff00ff00Seleccionar Emotes|r")
+    emotesTitle:SetText("|cff00ff00" .. L["SECTION_EMOTES"] .. "|r")
     
     local emotesDesc = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontHighlightSmall")
     emotesDesc:SetPoint("TOPLEFT", 20, yOffset - 20)
-    emotesDesc:SetText("Selecciona hasta 12 emotes para mostrar en el menú radial")
+    emotesDesc:SetText(L["SECTION_EMOTES_DESC"])
     
     -- Contador de emotes seleccionados
     local counterText = scrollChild:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -295,7 +296,7 @@ function MyEmote_Config_Init()
     
     local function updateCounter()
         local color = numberOfEmotesChecked >= 12 and "|cffff0000" or "|cff00ff00"
-        counterText:SetText("Emotes seleccionados: " .. color .. numberOfEmotesChecked .. "/12|r")
+        counterText:SetText(string.format(L["EMOTES_COUNTER"], color, numberOfEmotesChecked))
     end
     
     yOffset = yOffset - 60

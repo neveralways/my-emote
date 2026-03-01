@@ -4,7 +4,8 @@ MyEmoteData = MyEmoteData or {
 
 function checkAchievements()
     if MyEmoteData.emoteCount == 100 then
-        print("You have achieved 100 emotes!")
+        local L = MyEmoteL
+        print(L["ACHIEVEMENT_100"])
     end
 end
 

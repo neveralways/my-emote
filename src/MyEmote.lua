@@ -26,7 +26,8 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
 end)
 
 local function showEmoteCount()
-    print("You have used " .. MyEmoteData.emoteCount .. " emotes!")
+    local L = MyEmoteL
+    print(string.format(L["EMOTE_COUNT"], MyEmoteData.emoteCount))
 end
 
 SLASH_MYEMOTE1 = "/myemote"
