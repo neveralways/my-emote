@@ -16,6 +16,10 @@ eventFrame:SetScript("OnEvent", function(self, event, ...)
             if MyEmote_UI_Init then
                 MyEmote_UI_Init()
             end
+            -- Auto-cargar el perfil correspondiente a este personaje
+            if MyEmote_Profiles_AutoLoad then
+                MyEmote_Profiles_AutoLoad()
+            end
         end
     elseif event == "PLAYER_LOGOUT" then
     end
